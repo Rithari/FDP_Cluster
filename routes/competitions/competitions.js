@@ -44,4 +44,25 @@ router.get("/competitions/:competitionId", async (req, res) => {
   }
 });
 
+router.get("/competitions/:competitionId/statistics", async (req, res) => {
+  const competitionId = req.params.competitionId;
+  const cacheKey = `competitionStatistics_${competitionId}`;
+  const cachedData = competitionsCache.get(cacheKey);
+
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/competitions/${competitionId}/statistics`
+    );
+    competitionsCache.set(cacheKey, response.data);
+    res.json(response.data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
 module.exports = router;
