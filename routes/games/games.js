@@ -43,6 +43,54 @@ router.get("/games", async (req, res) => {
   }
 });
 
+router.get("/games/club/:clubId", async (req, res) => {
+  const clubId = req.params.clubId;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const searchQuery = req.query.search || "";
+  const sort = req.query.sort || "";
+
+  const skipIndex = (page - 1) * limit;
+  try {
+    let query = {
+      $or: [{ home_club_id: clubId }, { away_club_id: clubId }],
+    };
+    if (searchQuery) {
+      query = {
+        $and: [
+          {
+            $or: [
+              { home_club_name: new RegExp(searchQuery, "i") },
+              { away_club_name: new RegExp(searchQuery, "i") },
+            ],
+          },
+          {
+            $or: [{ home_club_id: clubId }, { away_club_id: clubId }],
+          },
+        ],
+      };
+    }
+
+    // handle sorting
+    let sortOptions = {};
+    if (sort) {
+      const sortField = sort.split(":")[0];
+      const sortOrder = sort.split(":")[1] === "asc" ? 1 : -1;
+      sortOptions[sortField] = sortOrder;
+    }
+
+    const games = await Game.find(query)
+      .sort(sortOptions)
+      .limit(limit)
+      .skip(skipIndex);
+    const total = await Game.countDocuments(query);
+
+    res.json({ data: games, total: total });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.get("/games/:gameId", async (req, res) => {
   const gameId = req.params.gameId;
   const cacheKey = `game_${gameId}`;
@@ -51,8 +99,14 @@ router.get("/games/:gameId", async (req, res) => {
   if (cachedData) {
     return res.json(cachedData);
   }
+
   try {
-    const game = await Game.findOne({ _id: req.params.gameId });
+    const game = await Game.findOne({ _id: gameId })
+      .populate("game_events")
+      .populate("game_lineups");
+    if (!game) {
+      return res.status(404).send("Game not found");
+    }
     gamesCache.set(cacheKey, game);
     res.json(game);
   } catch (err) {
