@@ -64,4 +64,8 @@ const gameLineupSchema = new mongoose.Schema({
 
 const GameLineup = mongoose.model("game_lineups", gameLineupSchema);
 
-module.exports = Game;
+module.exports = {
+  Game: mongoose.model("games", gameSchema),
+  GameEvent: mongoose.model("game_events", gameEventSchema),
+  GameLineup: mongoose.model("game_lineups", gameLineupSchema),
+};

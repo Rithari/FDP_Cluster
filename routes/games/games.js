@@ -1,7 +1,7 @@
 const express = require("express");
 const NodeCache = require("node-cache");
 const gamesCache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
-const Game = require("../../mongo_models/games");
+const { Game, GameEvent, GameLineup } = require("../../mongo_models/games");
 
 const router = express.Router();
 
@@ -101,14 +101,25 @@ router.get("/games/:gameId", async (req, res) => {
   }
 
   try {
-    const game = await Game.findOne({ _id: gameId })
-      .populate("game_events")
-      .populate("game_lineups");
+    const game = await Game.findOne({ game_id: gameId });
+
     if (!game) {
-      return res.status(404).send("Game not found");
+      return res.status(404).send("Game not found with ID: " + gameId);
     }
-    gamesCache.set(cacheKey, game);
-    res.json(game);
+
+    // Since game_events and game_lineups are related by game_id, we need to fetch them separately
+    const gameEvents = await GameEvent.find({ game_id: gameId });
+    const gameLineups = await GameLineup.find({ game_id: gameId });
+
+    // Now, combine the data into one object to return as the response
+    const combinedGameData = {
+      ...game.toObject(), // Convert the mongoose document to a plain JavaScript object
+      game_events: gameEvents,
+      game_lineups: gameLineups,
+    };
+
+    gamesCache.set(cacheKey, combinedGameData);
+    res.json(combinedGameData);
   } catch (err) {
     res.status(500).send(err.message);
   }
