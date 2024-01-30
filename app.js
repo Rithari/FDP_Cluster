@@ -7,6 +7,7 @@ const players = require("./routes/players/players");
 const competitions = require("./routes/competitions/competitions");
 const clubs = require("./routes/clubs/clubs");
 const games = require("./routes/games/games");
+const statistics = require("./routes/statistics/statistics");
 require("./drivers/mongodb");
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api", players);
 app.use("/api", competitions);
 app.use("/api", clubs);
 app.use("/api", games);
+app.use("/api", statistics);
 
 server.listen(port, () => {
   console.log(`Listening on port ${port}`);
