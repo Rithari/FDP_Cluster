@@ -63,4 +63,25 @@ router.get("/clubs/competition/:competitionId", async (req, res) => {
   }
 });
 
+router.get("/clubs/:clubId/players", async (req, res) => {
+  const clubId = req.params.clubId;
+  const cacheKey = `clubPlayers_${clubId}`;
+  const cachedData = clubsCache.get(cacheKey);
+
+  if (cachedData) {
+    return res.json(cachedData);
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/clubs/${clubId}/players`
+    );
+    clubsCache.set(cacheKey, response.data);
+    res.json(response.data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
 module.exports = router;
