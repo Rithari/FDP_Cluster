@@ -6,12 +6,15 @@ const { Game, GameEvent, GameLineup } = require("../../mongo_models/games");
 const router = express.Router();
 
 router.get("/games", async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
+  const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit) || 10;
-  const searchQuery = req.query.search || "";
+  const searchQuery = req.query.searchQuery || "";
   const sort = req.query.sort || "";
 
-  const skipIndex = (page - 1) * limit;
+  // Ensure that 'page' is not negative and defaults to 0 if undefined
+  const safePage = Math.max(0, page);
+
+  const skipIndex = safePage * limit;
   try {
     let query = {};
     if (searchQuery) {
