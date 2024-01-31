@@ -4,6 +4,8 @@ const NodeCache = require("node-cache");
 const competitionsCache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
 
 const router = express.Router();
+const springBootURL =
+  process.env.EXPRESS_APP_SPRING_BOOT_URL || "http://localhost:8080";
 
 router.get("/competitions", async (req, res) => {
   const cacheKey = "allCompetitions";
@@ -14,7 +16,7 @@ router.get("/competitions", async (req, res) => {
   }
 
   try {
-    const response = await axios.get("http://localhost:8080/competitions");
+    const response = await axios.get(`${springBootURL}/competitions`);
     competitionsCache.set(cacheKey, response.data);
     res.json(response.data);
   } catch (err) {
@@ -34,7 +36,7 @@ router.get("/competitions/:competitionId", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/competitions/${competitionId}`
+      `${springBootURL}/competitions/${competitionId}`
     );
     competitionsCache.set(cacheKey, response.data);
     res.json(response.data);
@@ -55,7 +57,7 @@ router.get("/competitions/:competitionId/statistics", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/competitions/${competitionId}/statistics`
+      `${springBootURL}/competitions/${competitionId}/statistics`
     );
     competitionsCache.set(cacheKey, response.data);
     res.json(response.data);

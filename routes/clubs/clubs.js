@@ -4,6 +4,8 @@ const NodeCache = require("node-cache");
 const clubsCache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
 
 const router = express.Router();
+const springBootURL =
+  process.env.EXPRESS_APP_SPRING_BOOT_URL || "http://localhost:8080";
 
 router.get("/clubs", async (req, res) => {
   const cacheKey = "allClubs";
@@ -14,7 +16,7 @@ router.get("/clubs", async (req, res) => {
   }
 
   try {
-    const response = await axios.get("http://localhost:8080/clubs");
+    const response = await axios.get(`${springBootURL}/clubs`);
     clubsCache.set(cacheKey, response.data);
     res.json(response.data);
   } catch (err) {
@@ -33,7 +35,7 @@ router.get("/clubs/:clubId", async (req, res) => {
   }
 
   try {
-    const response = await axios.get(`http://localhost:8080/clubs/${clubId}`);
+    const response = await axios.get(`${springBootURL}/clubs/${clubId}`);
     clubsCache.set(cacheKey, response.data);
     res.json(response.data);
   } catch (err) {
@@ -53,7 +55,7 @@ router.get("/clubs/competition/:competitionId", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/clubs/competition/${competitionId}`
+      `${springBootURL}/clubs/competition/${competitionId}`
     );
     clubsCache.set(cacheKey, response.data);
     res.json(response.data);
@@ -74,7 +76,7 @@ router.get("/clubs/:clubId/players", async (req, res) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/clubs/${clubId}/players`
+      `${springBootURL}/clubs/${clubId}/players`
     );
     clubsCache.set(cacheKey, response.data);
     res.json(response.data);

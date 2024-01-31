@@ -4,6 +4,8 @@ const NodeCache = require("node-cache");
 const playerCache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
 
 const router = express.Router();
+const springBootURL =
+  process.env.EXPRESS_APP_SPRING_BOOT_URL || "http://localhost:8080";
 
 router.get("/players", async (req, res) => {
   const cacheKey = "allPlayers";
@@ -14,7 +16,7 @@ router.get("/players", async (req, res) => {
   }
 
   try {
-    const response = await axios.get("http://localhost:8080/players");
+    const response = await axios.get(`${springBootURL}/players`);
     playerCache.set(cacheKey, response.data);
     res.json(response.data);
   } catch (err) {
@@ -33,9 +35,7 @@ router.get("/players/:playerId", async (req, res) => {
   }
 
   try {
-    const response = await axios.get(
-      `http://localhost:8080/players/${playerId}`
-    );
+    const response = await axios.get(`${springBootURL}/players/${playerId}`);
     playerCache.set(cacheKey, response.data);
     res.json(response.data);
   } catch (err) {
