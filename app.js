@@ -8,6 +8,7 @@ const competitions = require("./routes/competitions/competitions");
 const clubs = require("./routes/clubs/clubs");
 const games = require("./routes/games/games");
 const statistics = require("./routes/statistics/statistics");
+const bodyParser = require("body-parser");
 require("./drivers/mongodb");
 
 const app = express();
@@ -28,6 +29,9 @@ const io = socketIo(server, {
 });
 
 chat(io); // Pass the io instance to the chat module
+
+// Use body-parser middleware to parse JSON bodies
+app.use(bodyParser.json());
 
 app.use(cors(corsOptions));
 app.use("/api", players);
