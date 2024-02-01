@@ -5,17 +5,20 @@ const { Game, GameEvent, GameLineup } = require("../../mongo_models/games");
 
 const router = express.Router();
 
+/**
+ * Route to get a list of all games with optional search, sort, and pagination.
+ */
 router.get("/games", async (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit) || 10;
   const searchQuery = req.query.searchQuery || "";
   const sort = req.query.sort || "";
 
-  // Ensure that 'page' is not negative and defaults to 0 if undefined
   const safePage = Math.max(0, page);
-
   const skipIndex = safePage * limit;
+
   try {
+    // Constructor  the query for searching games
     let query = {};
     if (searchQuery) {
       query = {
@@ -26,7 +29,7 @@ router.get("/games", async (req, res) => {
       };
     }
 
-    // handle sorting
+    // Construct sorting options
     let sortOptions = {};
     if (sort) {
       const sortField = sort.split(":")[0];
@@ -34,6 +37,7 @@ router.get("/games", async (req, res) => {
       sortOptions[sortField] = sortOrder;
     }
 
+    // Fetch games from the database with the constructed query and sorting
     const games = await Game.find(query)
       .sort(sortOptions)
       .limit(limit)
@@ -46,6 +50,9 @@ router.get("/games", async (req, res) => {
   }
 });
 
+/**
+ * Route to get a list of games for a specific club with optional search, sort, and pagination.
+ */
 router.get("/games/club/:clubId", async (req, res) => {
   const clubId = req.params.clubId;
   const page = parseInt(req.query.page) || 1;
@@ -55,6 +62,7 @@ router.get("/games/club/:clubId", async (req, res) => {
 
   const skipIndex = (page - 1) * limit;
   try {
+    // Construct the query for searching games
     let query = {
       $or: [{ home_club_id: clubId }, { away_club_id: clubId }],
     };
@@ -74,7 +82,7 @@ router.get("/games/club/:clubId", async (req, res) => {
       };
     }
 
-    // handle sorting
+    // Construct sorting options
     let sortOptions = {};
     if (sort) {
       const sortField = sort.split(":")[0];
@@ -94,6 +102,10 @@ router.get("/games/club/:clubId", async (req, res) => {
   }
 });
 
+/**
+ * Route to get detailed information about a specific game.
+ * Includes game events and lineups. Results are cached.
+ */
 router.get("/games/:gameId", async (req, res) => {
   const gameId = req.params.gameId;
   const cacheKey = `game_${gameId}`;
