@@ -18,7 +18,7 @@ const originURL = process.env.EXPRESS_APP_ORIGIN_URL || "http://localhost:5173";
 
 // Configure CORS options
 const corsOptions = {
-  origin: [originURL, "http://localhost", "http://localhost:5173"],
+  origin: "*",
   methods: ["GET", "POST"],
 };
 
