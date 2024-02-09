@@ -31,38 +31,6 @@ const mongoose = require("mongoose");
  * @property {Array<string>} game_lineups - The IDs of the game lineups associated with the game.
  */
 
-/**
- * Represents a game event.
- * @typedef {Object} GameEvent
- * @property {string} _id - The ID of the game event.
- * @property {number} club_id - The ID of the club.
- * @property {Date} date - The date of the game event.
- * @property {string} description - The description of the game event.
- * @property {string} game_event_id - The ID of the game event.
- * @property {number} game_id - The ID of the game.
- * @property {number} minute - The minute of the game event.
- * @property {number} player_assist_id - The ID of the player who assisted in the game event.
- * @property {number} player_id - The ID of the player involved in the game event.
- * @property {number} player_in_id - The ID of the player who came in as a substitute in the game event.
- * @property {string} type - The type of the game event.
- * @property {number} year - The year of the game event.
- */
-
-/**
- * Represents a game lineup.
- * @typedef {Object} GameLineup
- * @property {string} _id - The ID of the game lineup.
- * @property {number} club_id - The ID of the club.
- * @property {number} game_id - The ID of the game.
- * @property {string} game_lineups_id - The ID of the game lineup.
- * @property {string} number - The t-shirt number of the player.
- * @property {number} player_id - The ID of the player in the lineup.
- * @property {string} player_name - The name of the player in the lineup.
- * @property {string} position - The position of the player on the field.
- * @property {number} team_captain - Indicates if the player is the team captain (0 or 1).
- * @property {string} type - The type of the game lineup.
- */
-
 const gameSchema = new mongoose.Schema({
   _id: String,
   aggregate: Number,
@@ -98,48 +66,4 @@ const gameSchema = new mongoose.Schema({
  */
 const Game = mongoose.model("games", gameSchema);
 
-const gameEventSchema = new mongoose.Schema({
-  _id: String,
-  club_id: Number,
-  date: Date,
-  description: String,
-  game_event_id: String,
-  game_id: Number,
-  minute: Number,
-  player_assist_id: Number,
-  player_id: Number,
-  player_in_id: Number,
-  type: String,
-  year: Number,
-});
-
-/**
- * Represents a Mongoose model for game events.
- * @type {import("mongoose").Model<GameEvent>}
- */
-const GameEvent = mongoose.model("game_events", gameEventSchema);
-
-const gameLineupSchema = new mongoose.Schema({
-  _id: String,
-  club_id: Number,
-  game_id: Number,
-  game_lineups_id: String,
-  number: String,
-  player_id: Number,
-  player_name: String,
-  position: String,
-  team_captain: Number,
-  type: String,
-});
-
-/**
- * Represents a Mongoose model for game lineups.
- * @type {import("mongoose").Model<GameLineup>}
- */
-const GameLineup = mongoose.model("game_lineups", gameLineupSchema);
-
-module.exports = {
-  Game,
-  GameEvent,
-  GameLineup,
-};
+module.exports = Game;
